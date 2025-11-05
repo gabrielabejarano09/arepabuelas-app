@@ -1,0 +1,27 @@
+# Archivos sensibles
+.env
+*.log
+
+# Dependencias
+node_modules/
+logs/
+tests/
+
+# Archivos temporales
+.DS_Store
+*.tmp
+
+backend/.env
+*.db
+*.sqlite
+
+target/
+dependency-reduced-pom.xml
+
+*.iml
+.idea/
+.vscode/
+*.class
+  
+*.bak
+*.swp
