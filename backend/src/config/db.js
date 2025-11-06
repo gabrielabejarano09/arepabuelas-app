@@ -1,12 +1,12 @@
 import pkg from 'pg';
 const { Pool } = pkg;
-import dotenv from 'dotenv';
-dotenv.config();
+import 'dotenv/config';
 
 export const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DB_URI
 });
 
-pool.connect()
-    .then(() => console.log('✅ Conectado a la base de datos'))
-    .catch(err => console.error('❌ Error de conexión BD:', err.message));
+pool.on('error', (err) => {
+  console.error('Unexpected PG client error', err);
+  process.exit(-1);
+});

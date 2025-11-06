@@ -8,6 +8,9 @@ import morgan from "morgan";
 import { pool } from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/users.routes.js";
+import productRoutes from './routes/product.routes.js';
+import commentRoutes from './routes/comment.routes.js';
+import orderRoutes from "./routes/order.routes.js";
 
 dotenv.config();
 
@@ -39,6 +42,9 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/comments', commentRoutes);
+app.use("/orders", orderRoutes);
 
 // Limita peticiones por IP
 const limiter = rateLimit({
@@ -51,10 +57,19 @@ app.use(limiter);
 // Rutas
 app.use("/api/auth", authRoutes);
 
-// Ruta de prueba
+// Ruta de prueba 1
 app.get("/", (req, res) => {
     res.send("🫓 Servidor Arepabuelas funcionando");
 });
+
+// Ruta de prueba 2
+app.get("/env-test", (req, res) => {
+  res.json({
+    mongo: process.env.DB_URI ? "ok" : "missing",
+    jwt: process.env.JWT_SECRET ? "ok" : "missing"
+  });
+});
+
 
 // Conexión a la base de datos
 pool.connect()
