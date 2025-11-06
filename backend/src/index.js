@@ -51,10 +51,19 @@ app.use(limiter);
 // Rutas
 app.use("/api/auth", authRoutes);
 
-// Ruta de prueba
+// Ruta de prueba 1
 app.get("/", (req, res) => {
     res.send("🫓 Servidor Arepabuelas funcionando");
 });
+
+// Ruta de prueba 2
+app.get("/env-test", (req, res) => {
+  res.json({
+    mongo: process.env.DB_URI ? "ok" : "missing",
+    jwt: process.env.JWT_SECRET ? "ok" : "missing"
+  });
+});
+
 
 // Conexión a la base de datos
 pool.connect()
