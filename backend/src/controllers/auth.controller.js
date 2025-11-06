@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { createUser, findByEmail } from "../models/user.model.js";
 import { auditLogger } from "../middleware/auditLogger.js";
+import 'dotenv/config';
 
 dotenv.config();
 
@@ -80,10 +81,11 @@ export const login = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user.id, role: user.is_admin ? "ADMIN" : "USER" },
+            { id: user.id, name: user.name, email: user.email, role: user.is_admin ? "ADMIN" : "USER" },
             process.env.JWT_SECRET,
             { expiresIn: "8h" }
         );
+
 
         auditLogger("LOGIN_SUCCESS", {
             email,
