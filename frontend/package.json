@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/multer": "^2.0.0",
     "axios": "^1.13.2",
+    "lucide-react": "^0.552.0",
     "multer": "^2.0.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@types/axios": "^0.9.36",
     "@types/node": "^24.6.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
