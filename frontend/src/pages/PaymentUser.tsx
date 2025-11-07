@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar"; // tu componente existente
 import "./PaymentUser.css";
 
 interface OrderItem {
