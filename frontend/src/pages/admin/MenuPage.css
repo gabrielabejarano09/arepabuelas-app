@@ -143,6 +143,7 @@
 
 .product-action-btn {
   color: white;
+  background-color: #4a3f31;
 
 }
 
@@ -158,4 +159,23 @@
 }
 .name{
     width: 7rem;
+}
+
+
+.product-card-wrapper {
+  position: relative; /* Necesario para posicionar el botón de eliminar */
+}
+
+.product-card-link {
+  text-decoration: none; /* Quita el subrayado del enlace */
+  color: inherit; /* Hereda el color del texto normal */
+  display: block; /* Hace que el enlace ocupe todo el espacio de la tarjeta */
+}
+
+/* El botón de eliminar se superpone a la tarjeta */
+.product-action-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 10; /* Asegura que esté por encima del contenido de la tarjeta */
 }
