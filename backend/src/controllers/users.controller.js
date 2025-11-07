@@ -121,6 +121,15 @@ export const getPendingUsers = async (req, res) => {
   }
 };
 
+export const getActiveUsers = async (req, res) => {
+  try {
+    const result = await pool.query("SELECT id, name, email, status FROM users WHERE status = 'active'");
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ message: "Error al obtener usuarios activos." });
+  }
+};
+
 export const approveUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -149,6 +158,8 @@ export const approveUser = async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Error al aprobar usuario" });
   }
+
 };
+
 
 

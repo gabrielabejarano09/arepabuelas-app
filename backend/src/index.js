@@ -39,8 +39,7 @@ if (!fs.existsSync(uploadDir)) {
 // Esto permite que las imágenes sean accesibles desde el navegador a través de una URL.
 // Por ejemplo: http://localhost:4000/uploads/products/mi-imagen.png
 app.use(`/${uploadDir}`, express.static(path.resolve(uploadDir)));
-
-// --- FIN DE LA CONFIGURACIÓN ---
+-
 
 
 // Middlewares

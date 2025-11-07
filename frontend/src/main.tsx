@@ -17,6 +17,9 @@ import DashboardLayout from './components/DashboardLayout';
 // Páginas de Admin
 import MenuPage from './pages/admin/MenuPage';
 import AddProductPage from './pages/admin/AddProductPage';
+import EditProductPage from './pages/admin/EditProductPage';
+import UsersPage from './pages/admin/UsersPage';
+import HistoryPage from './pages/admin/HistoryPage';
 
 
 //import UserHomePage from './pages/user/UserHomePage';
@@ -38,6 +41,9 @@ createRoot(document.getElementById('root')!).render(
           <Route element={<DashboardLayout />}>
             <Route path="/menu" element={<MenuPage />} />
             <Route path="/menu/nuevo" element={<AddProductPage />} />
+            <Route path="/menu/edit/:id" element={<EditProductPage />} />
+            <Route path="/usuarios" element={<UsersPage />} />
+            <Route path="/historial" element={<HistoryPage />} />
             {/* ... más rutas de admin aquí ... */}
           </Route>
         </Route>
