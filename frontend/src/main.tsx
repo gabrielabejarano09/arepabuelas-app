@@ -21,6 +21,9 @@ import DashboardLayoutClient from "./components/DashboardLayoutClient";
 // Páginas de Admin
 import MenuPage from "./pages/admin/MenuPage";
 import AddProductPage from "./pages/admin/AddProductPage";
+import EditProductPage from "./pages/admin/EditProductPage";
+import UsersPage from "./pages/admin/UsersPage";
+import HistoryPage from "./pages/admin/HistoryPage";
 
 //import UserHomePage from './pages/user/UserHomePage';
 //import UserMenuPage from './pages/user/UserMenuPage';
