@@ -66,7 +66,7 @@
 
 .product-image, .product-image-placeholder {
   flex-shrink: 0; /* Evita que la imagen se encoja */
-  width: 120px;
+  width: 100px;
   height: 120px;
   object-fit: cover;
   border-radius: 10px;
@@ -143,8 +143,6 @@
 
 .product-action-btn {
   color: white;
-  background-color: #4a3f31;
-
 }
 
 .error-text {
@@ -160,7 +158,6 @@
 .name{
     width: 7rem;
 }
-
 
 .product-card-wrapper {
   position: relative; /* Necesario para posicionar el botón de eliminar */

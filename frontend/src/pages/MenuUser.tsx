@@ -1,5 +1,5 @@
 import axios from "axios";
-import "./MenuPage.css";
+import "./MenuUser.css";
 import { useEffect, useState } from "react";
 import { ShoppingCart } from "lucide-react";
 
