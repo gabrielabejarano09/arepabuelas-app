@@ -1,0 +1,156 @@
+.menu-page {
+  width: 100%;
+  padding: 2rem 3rem;
+  box-sizing: border-box;
+}
+
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.menu-header h1 {
+  font-size: 2.5rem;
+  color: #5E503F;
+  margin: 0;
+}
+
+.menu-header p {
+  color: #8a817c;
+  margin-top: 5px;
+}
+
+.add-plate-btn {
+  background-color: #5E503F;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-decoration: none; /* Para quitar el subrayado del Link */
+}
+
+.add-plate-btn:hover {
+  background-color: #4a3f31;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+.product-card {
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+  padding: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* NUEVO: Contenedor para el layout de 2 columnas */
+.card-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Espacio entre imagen e información */
+  align-items: center;
+  width: 100%;
+}
+
+.product-image, .product-image-placeholder {
+  flex-shrink: 0; /* Evita que la imagen se encoja */
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  background-color: #f0f0f0;
+}
+
+.product-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  font-weight: 500;
+}
+
+.product-info {
+  flex-grow: 1; /* Permite que la sección de info ocupe el espacio restante */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.product-info h3 {
+  font-size: 1.4rem;
+  color: #333;
+  margin: 0 0 5px 0;
+}
+
+.product-info p {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+  flex-grow: 1; /* Empuja el footer hacia abajo */
+}
+
+.product-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.product-price {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #5E503F;
+}
+
+.product-capacity {
+  color: #8a817c;
+  font-size: 0.9rem;
+}
+
+.product-action-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #5E503F;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.product-action-btn:hover {
+  background-color: #c9184a; /* Color rojo al pasar el mouse para indicar peligro */
+}
+
+.product-action-btn {
+  color: white;
+
+}
+
+.error-text {
+  color: red;
+}
+
+.card-header{
+    display: flex;
+    flex-direction: row;
+    color: #5E503F;
+    width: 100%;
+}

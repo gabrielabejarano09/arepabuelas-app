@@ -1,0 +1,130 @@
+/* Importa una fuente similar desde Google Fonts (opcional, pero recomendado) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Quicksand:wght@300..700&display=swa"');
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Quicksand', sans-serif;
+  background-color: #fdfdfd;
+}
+
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Sección Izquierda (Logo) */
+.login-logo-section {
+  flex: 1;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.logo {
+  max-width: 30%;
+  margin-bottom: 15px;
+}
+
+.brand-name {
+  font-size: 3rem;
+  letter-spacing: 3px;
+  color: #514136; /* Marrón oscuro */
+  margin: 0;
+}
+
+.tagline {
+  font-size: 1.5rem;
+  color: #8a817c; /* Un gris cálido */
+  margin-top: 7px;
+}
+
+/* Sección Derecha (Formulario) */
+.login-form-section {
+  flex:1;
+  background-color: #EAE0D5; /* Beige claro */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 380px;
+  padding: 20px;
+}
+
+.form-wrapper h2 {
+  font-size: 3rem;
+  color: #514136;
+  margin-bottom: 2px;
+}
+
+.subtitle {
+  color: #514136;
+  margin-bottom: 30px;
+  font-size: 1.7rem;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #c9c0b5;
+  border-radius: 8px;
+  background-color: #EAE0D5;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1rem;
+  color: #514136;
+  box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+}
+
+.input-group input::placeholder {
+  color: #514136;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #514136;
+}
+
+.login-button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #514136;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #4a3f31;
+}
+
+.error-message {
+  color: #9d0208; /* Un color rojo para el error */
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.link-text {
+  margin-top: 15px;
+  color: #514136;
+}
+
+.link {
+    color: #514136;
+    text-decoration: underline;
+}
