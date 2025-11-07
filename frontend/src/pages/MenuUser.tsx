@@ -1,7 +1,8 @@
 import axios from "axios";
-import "./MenuPage.css";
-import { useEffect, useState } from "react";
+import "./MenuUser.css";
+import { useEffect, useState, useRef } from "react";
 import { ShoppingCart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Product {
   id: number;
@@ -23,6 +24,20 @@ const MenuUser = () => {
   const [showCart, setShowCart] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const backendUrl = "http://localhost:4000";
+  const cartRef = useRef<HTMLDivElement | null>(null);
+
+  const navigate = useNavigate();
+
+  // Cerrar carrito si se hace clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (cartRef.current && !cartRef.current.contains(event.target as Node)) {
+        setShowCart(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Obtener productos
   useEffect(() => {
@@ -50,6 +65,7 @@ const MenuUser = () => {
     });
   };
 
+  // Quitar del carrito
   const removeFromCart = (productId: number) => {
     setCart((prev) =>
       prev
@@ -66,17 +82,61 @@ const MenuUser = () => {
   );
 
   const handleCheckout = () => {
-    alert(`Ir a pagar - total: $${total.toLocaleString("es-CO")}`);
-    // Aquí podrías redirigir al checkout real con tu endpoint /orders
+    navigate("/payment");
   };
 
   return (
     <div className="menu-page">
+      {/* Header */}
       <header className="menu-header">
         <h1>Menú</h1>
-        <div className="cart-icon" onClick={() => setShowCart(!showCart)}>
-          <ShoppingCart size={28} />
-          {cart.length > 0 && <span className="cart-count">{cart.length}</span>}
+        <div className="cart-wrapper" ref={cartRef}>
+          <div className="cart-icon" onClick={() => setShowCart(!showCart)}>
+            <ShoppingCart size={28} />
+            {cart.length > 0 && (
+              <span className="cart-count">{cart.length}</span>
+            )}
+          </div>
+
+          {/* Dropdown del carrito */}
+          {showCart && (
+            <div className="cart-dropdown">
+              <h3>Orden</h3>
+              {cart.length === 0 ? (
+                <p>Tu carrito está vacío.</p>
+              ) : (
+                <>
+                  {cart.map((item) => (
+                    <div key={item.product.id} className="cart-item">
+                      <img
+                        src={`${backendUrl}/uploads/products/${item.product.image}`}
+                        alt={item.product.name}
+                      />
+                      <div className="cart-info">
+                        <p>{item.product.name}</p>
+                        <p>${item.product.price.toLocaleString("es-CO")}</p>
+                      </div>
+                      <div className="qty-controls">
+                        <button onClick={() => removeFromCart(item.product.id)}>
+                          -
+                        </button>
+                        <span>{item.qty}</span>
+                        <button onClick={() => addToCart(item.product)}>
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="cart-total">
+                    <strong>Total:</strong> ${total.toLocaleString("es-CO")}
+                  </div>
+                  <button className="checkout-btn" onClick={handleCheckout}>
+                    Ir a pagar
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
@@ -103,51 +163,15 @@ const MenuUser = () => {
               <span className="product-price">
                 ${product.price.toLocaleString("es-CO")}
               </span>
-              <span className="product-stock">👥 {product.stock}</span>
+              <span className="product-stock">
+                Disponibles: {product.stock}
+              </span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Panel lateral del carrito */}
-      {showCart && (
-        <div className="cart-panel">
-          <h2>Orden</h2>
-          {cart.length === 0 ? (
-            <p>Tu carrito está vacío.</p>
-          ) : (
-            <>
-              {cart.map((item) => (
-                <div key={item.product.id} className="cart-item">
-                  <img
-                    src={`${backendUrl}/uploads/products/${item.product.image}`}
-                    alt={item.product.name}
-                  />
-                  <div className="cart-info">
-                    <p>{item.product.name}</p>
-                    <span>${item.product.price.toLocaleString("es-CO")}</span>
-                  </div>
-                  <div className="qty-controls">
-                    <button onClick={() => removeFromCart(item.product.id)}>
-                      -
-                    </button>
-                    <span>{item.qty}</span>
-                    <button onClick={() => addToCart(item.product)}>+</button>
-                  </div>
-                </div>
-              ))}
-              <div className="cart-total">
-                <strong>Total:</strong> ${total.toLocaleString("es-CO")}
-              </div>
-              <button className="checkout-btn" onClick={handleCheckout}>
-                Ir a pagar
-              </button>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* Modal de producto */}
+      {/* Modal del producto */}
       {selectedProduct && (
         <div className="modal-overlay" onClick={() => setSelectedProduct(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
