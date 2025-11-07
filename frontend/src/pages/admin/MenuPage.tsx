@@ -100,7 +100,7 @@ const MenuPage = () => {
                 <div className="product-image-placeholder">Sin imagen</div>
               )}
 
-              <h3>{product.name}</h3>
+              <h3 className='name'>{product.name}</h3>
               </div >
               <div className="product-info">
                 <p>{product.description}</p>

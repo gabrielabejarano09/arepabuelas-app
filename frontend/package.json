@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/multer": "^2.0.0",
     "axios": "^1.13.2",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.552.0",
     "multer": "^2.0.2",
     "react": "^19.1.1",
