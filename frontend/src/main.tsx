@@ -58,6 +58,7 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/home" element={<MenuUser />} />
             <Route path="/purchased" element={<HistorialUser />} />
             <Route path="/payment" element={<PaymentUser />} />
+            <Route path="/payment/:orderId" element={<PaymentUser />} />
             {/* ... más rutas de usuario aquí ... */}
           </Route>
           |{" "}

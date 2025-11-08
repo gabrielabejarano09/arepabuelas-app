@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyToken } from "../middleware/auth.js";
-import { createOrder, payOrder, getUserOrders } from "../controllers/order.controller.js";
+import { createOrder, payOrder, getUserOrders, getOrderById } from "../controllers/order.controller.js";
 
 const router = express.Router();
 
@@ -12,5 +12,7 @@ router.post("/pay", verifyToken, payOrder);
 
 // Historial de compras
 router.get("/", verifyToken, getUserOrders);
+
+router.get("/:id", verifyToken, getOrderById);
 
 export default router;
