@@ -1,12 +1,12 @@
 import axios from "axios";
 import "./MenuUser.css";
 import { useEffect, useState, useRef } from "react";
-import { ShoppingCart } from "lucide-react";
+// --- CAMBIO: Importamos el ícono 'Users' ---
+import { ShoppingCart, Users } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from 'axios';
 
-// 1. La interfaz vuelve a usar 'id' numérico, como en tu primer código.
-// Esto es lo que tu base de datos SQL probablemente usa.
+// ... (Las interfaces Product y CartItem no cambian) ...
 interface Product {
   id: number;
   name: string;
@@ -21,7 +21,9 @@ interface CartItem {
   qty: number;
 }
 
+
 const MenuUser = () => {
+  // ... (Toda la lógica de useState, useEffects, addToCart, etc., no cambia) ...
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
@@ -83,7 +85,6 @@ const MenuUser = () => {
     0
   );
 
-  // --- FUNCIÓN handleCheckout COMPLETAMENTE REESCRITA ---
   const handleCheckout = async () => {
     if (cart.length === 0) return;
     setIsCreatingOrder(true);
@@ -95,16 +96,13 @@ const MenuUser = () => {
         navigate("/login");
         return;
       }
-
-      // 2. Se construye el 'payload' con la estructura EXACTA que espera el nuevo backend
+      
       const orderPayload = {
-        // La clave principal ahora es 'products'
         products: cart.map((item) => ({
-          product_id: item.product.id, // Se envía 'product_id' con el id numérico
-          quantity: item.qty,         // Se envía 'quantity' en lugar de 'qty'
-          price: item.product.price,    // El precio se mantiene
+          product_id: item.product.id,
+          quantity: item.qty,
+          price: item.product.price,
         })),
-        // La clave del total ahora es 'totalAmount'
         totalAmount: total,
       };
 
@@ -115,18 +113,15 @@ const MenuUser = () => {
         },
       };
 
-      // Se llama al mismo endpoint, pero el backend ahora procesa el nuevo payload
       const { data: response } = await axios.post(
         `${backendUrl}/api/orders`,
         orderPayload,
         config
       );
-
-      // El nuevo backend devuelve un objeto 'order' con un 'id' numérico
+      
       const orderId = response.order.id;
       if (orderId) {
         setCart([]);
-        // Redirigimos a la página de pago, que ahora también usará el id numérico
         navigate(`/payment/${orderId}`);
       } else {
         throw new Error("La respuesta del servidor no incluyó un ID de orden.");
@@ -140,10 +135,11 @@ const MenuUser = () => {
     }
   };
 
+
   return (
     <div className="menu-page">
-      {/* ... El resto del JSX no necesita cambios, solo asegúrate de usar 'id' para las keys ... */}
       <header className="menu-header">
+        {/* ... (El header y el carrito no cambian) ... */}
         <h1>Menú</h1>
         <div className="cart-wrapper" ref={cartRef}>
           <div className="cart-icon" onClick={() => setShowCart(!showCart)}>
@@ -157,7 +153,7 @@ const MenuUser = () => {
                 <>
                   {cart.map((item) => (
                     <div key={item.product.id} className="cart-item">
-                      <img src={`${backendUrl}/uploads/products/${item.product.image}`} alt={item.product.name} />
+                      <img src={`${backendUrl}/uploads/products/${item.product.image}`} alt={item.product.name} className="image" />
                       <div className="cart-info">
                         <p>{item.product.name}</p>
                         <p>${item.product.price.toLocaleString("es-CO")}</p>
@@ -181,19 +177,45 @@ const MenuUser = () => {
           )}
         </div>
       </header>
+
       <div className="product-grid">
         {products.map((product) => (
-          <div key={product.id} className="product-card" onClick={() => setSelectedProduct(product)}>
-            {product.image ? (<img src={`${backendUrl}/uploads/products/${product.image}`} alt={product.name} className="product-image"/>) : (<div className="product-image-placeholder">Sin imagen</div>)}
-            <h3>{product.name}</h3>
-            <p>{product.description}</p>
-            <div className="product-footer">
-              <span className="product-price">${product.price.toLocaleString("es-CO")}</span>
-              <span className="product-stock">Disponibles: {product.stock}</span>
+          // --- 👇 TODA LA TARJETA HA SIDO REESTRUCTURADA 👇 ---
+          <div key={product.id} className="product-card">
+            {/* El onClick para abrir el modal ahora está en un div aparte */}
+            <div className="card-clickable-area" onClick={() => setSelectedProduct(product)}>
+              {product.image ? (
+                <img src={`${backendUrl}/uploads/products/${product.image}`} alt={product.name} className="product-image"/>
+              ) : (
+                <div className="product-image-placeholder">Sin imagen</div>
+              )}
+              <h3 className="product-name">{product.name}</h3>
+              <p className="product-description">{product.description}</p>
+              
+              <div className="product-meta">
+                <span className="product-price">${product.price.toLocaleString("es-CO")}</span>
+                <span className="product-stock">
+                  <Users size={18} />
+                  {product.stock}
+                </span>
+              </div>
             </div>
+
+            {/* Este es el nuevo botón de "Añadir a Carrito" */}
+            <button
+              className="card-add-btn"
+              onClick={(e) => {
+                e.stopPropagation(); // Evita que se abra el modal al hacer clic
+                addToCart(product);
+              }}
+            >
+              Añadir a Carrito
+            </button>
           </div>
         ))}
       </div>
+
+      {/* ... (El modal no cambia) ... */}
       {selectedProduct && (
         <div className="modal-overlay" onClick={() => setSelectedProduct(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
