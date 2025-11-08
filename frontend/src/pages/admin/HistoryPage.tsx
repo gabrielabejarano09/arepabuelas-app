@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import './HistoryPage.css'; // Crearemos este archivo para los estilos
+import { useEffect, useState } from "react";
+import axios from "axios";
+import "./HistoryPage.css"; // Crearemos este archivo para los estilos
 
 // Interfaz para un item dentro de una orden
 interface OrderItem {
@@ -24,19 +24,19 @@ const HistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const backendUrl = 'http://localhost:4000';
+  const backendUrl = "http://localhost:4000";
 
   useEffect(() => {
     const fetchUserOrders = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         // Tu backend ya tiene la ruta GET '/' en order.routes.js para esto
         const response = await axios.get(`${backendUrl}/api/orders`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         setOrders(response.data);
       } catch (err) {
-        setError('No se pudo cargar el historial de órdenes.');
+        setError("No se pudo cargar el historial de órdenes.");
         console.error(err);
       } finally {
         setLoading(false);
@@ -52,17 +52,19 @@ const HistoryPage = () => {
   return (
     <div className="history-page">
       <h1>Historial de Órdenes</h1>
-      
+
       {orders.length > 0 ? (
         <div className="orders-list">
-          {orders.map(order => (
+          {orders.map((order) => (
             <div key={order.id} className="order-card">
               <div className="order-header">
                 <h3>Orden #{order.id}</h3>
                 <span className="order-date">
                   {/* Formateamos la fecha para que sea más legible */}
-                  {new Date(order.created_at).toLocaleDateString('es-CO', {
-                    year: 'numeric', month: 'long', day: 'numeric'
+                  {new Date(order.created_at).toLocaleDateString("es-CO", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                   })}
                 </span>
               </div>
@@ -73,15 +75,20 @@ const HistoryPage = () => {
                     <li key={index} className="order-item">
                       <span>Producto ID: {item.product_id}</span>
                       <span>Cantidad: {item.quantity}</span>
-                      <span>Precio Unitario: ${parseFloat(item.price).toLocaleString('es-CO')}</span>
+                      <span>
+                        Precio Unitario: $
+                        {parseFloat(item.price).toLocaleString("es-CO")}
+                      </span>
                     </li>
                   ))}
                 </ul>
               </div>
               <div className="order-footer">
-                {order.coupon && <span className="coupon-tag">Cupón: {order.coupon}</span>}
+                {order.coupon && (
+                  <span className="coupon-tag">Cupón: {order.coupon}</span>
+                )}
                 <strong className="order-total">
-                  Total: ${parseFloat(order.total).toLocaleString('es-CO')}
+                  Total: ${parseFloat(order.total).toLocaleString("es-CO")}
                 </strong>
               </div>
             </div>

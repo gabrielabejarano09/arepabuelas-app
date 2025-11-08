@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import "./DashboardLayout.css";
-import SidebarClient from "./sidebarClient";
+import SidebarClient from "./SidebarClient_temp";
 
 const DashboardLayoutClient = () => {
   return (
