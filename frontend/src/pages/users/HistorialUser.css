@@ -1,41 +1,110 @@
-.history-page {
-  padding: 2rem;
-  max-width: 800px;
-  margin-left: 80px; /* 👈 margen a la izquierda */
-  color: #000; /* 👈 texto negro */
+/* --- Contenedor Principal de la Página de Historial --- */
+.historial-user-container {
+  max-width: 800px; /* Mantiene un ancho de línea legible */
+  margin: 0 auto;   /* Centra el contenedor en la página */
+  padding: 2rem 1rem; /* Espaciado interno (más en vertical, menos en horizontal) */
+  background-color: #f9fafb; /* Un fondo gris muy sutil para que las tarjetas resalten */
+  min-height: 100vh; /* Asegura que el fondo ocupe toda la altura */
 }
 
+.historial-title {
+  font-size: 1.75rem; /* Tamaño de fuente más grande para el título */
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: #111827; /* Un negro más suave que el #000 */
+}
+
+/* --- Tarjeta de Cada Orden --- */
 .order-card {
-  background: #fff;
+  background: white; /* Fondo blanco puro */
   border-radius: 12px;
   padding: 1.5rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb; /* Un borde sutil */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.3s ease; /* Transición suave para el hover */
 }
 
+.order-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Cabecera de la Tarjeta (Fecha, Total) --- */
 .order-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* Permite que los elementos se muevan a la siguiente línea si no caben */
+  gap: 1rem; /* Espacio entre los elementos de la cabecera */
+  padding-bottom: 1rem;
   margin-bottom: 1rem;
-  color: #000; /* texto negro */
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.order-items {
-  border-top: 1px solid #eee;
-  padding-top: 1rem;
-  color: #000; /* texto negro */
+.order-info {
+  font-size: 0.9rem;
+  color: #4b5563; /* Gris oscuro para información secundaria */
+}
+
+.order-total {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #111827;
+}
+
+/* --- Lista de Productos Dentro de la Tarjeta --- */
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Espacio entre cada producto */
 }
 
 .order-item {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 0.5rem;
 }
 
 .item-img {
   width: 60px;
   height: 60px;
   border-radius: 8px;
-  object-fit: cover;
+  object-fit: cover; /* Evita que la imagen se deforme */
+  border: 1px solid #f3f4f6;
+}
+
+.item-details {
+  flex-grow: 1; /* Hace que este contenedor ocupe el espacio disponible */
+}
+
+.item-name {
+  font-weight: 600; /* Semibold */
+  color: #374151;
+}
+
+.item-quantity {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.item-price {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+/* --- Media Query para Responsividad en Móviles --- */
+@media (max-width: 640px) {
+  .historial-user-container {
+    padding: 1.5rem 1rem;
+  }
+  
+  .order-header {
+    flex-direction: column; /* Apila los elementos de la cabecera */
+    align-items: flex-start; /* Los alinea a la izquierda */
+    gap: 0.5rem;
+  }
+
+  .order-card {
+    padding: 1rem;
+  }
 }

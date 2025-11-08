@@ -132,17 +132,40 @@ export const payOrder = async (req, res) => {
 export const getUserOrders = async (req, res) => {
   try {
     const userId = req.user.id;
+
+    // Esta consulta une las órdenes con sus items y los datos de los productos (nombre, imagen)
     const { rows } = await pool.query(
-      `SELECT o.id, o.total, o.coupon, o.created_at, o.is_paid, o.status
+      `SELECT 
+         o.id, 
+         o.total, 
+         o.coupon, 
+         o.created_at, 
+         o.is_paid,
+         o.status,
+         -- Si no hay items, devolvemos un array JSON vacío '[]'
+         COALESCE(
+           json_agg(
+             json_build_object(
+               'product_id', p.id,
+               'name', p.name,
+               'image', p.image,
+               'quantity', oi.quantity,
+               'price', oi.price
+             )
+           ) FILTER (WHERE p.id IS NOT NULL), '[]'
+         ) AS items
        FROM orders o
-       WHERE o.user_id=$1
+       LEFT JOIN order_items oi ON o.id = oi.order_id
+       LEFT JOIN products p ON oi.product_id = p.id
+       WHERE o.user_id = $1
+       GROUP BY o.id
        ORDER BY o.created_at DESC`,
       [userId]
     );
 
     res.status(200).json(rows);
   } catch (err) {
-    console.error(err);
+    console.error("Error al obtener historial de compras:", err);
     res.status(500).json({ message: "Error al obtener historial de compras" });
   }
 };

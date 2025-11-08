@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./HistorialUser.css"; // <-- Asegúrate que la ruta a tu CSS es correcta
 
+// Interfaces (sin cambios)
 interface OrderItem {
   product_id: number;
   quantity: number;
-  price: number;
-  name?: string;
-  image?: string;
+  price: string;
+  name: string;
+  image: string;
 }
 
 interface Order {
   id: string;
-  total: number;
+  total: string;
   coupon?: string;
   created_at: string;
   items: OrderItem[];
@@ -20,17 +22,15 @@ interface Order {
 const HistorialUser: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const backendUrl = "http://localhost:4000";
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const token = localStorage.getItem("token");
-        const { data } = await axios.get("http://localhost:4000/orders", {
+        const { data } = await axios.get(`${backendUrl}/api/orders`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        // 🔹 (Opcional) Puedes hacer otra petición para traer nombres/imágenes de productos
-        // o simplemente mostrar los IDs por ahora.
         setOrders(data);
       } catch (error) {
         console.error("Error al obtener historial:", error);
@@ -38,64 +38,60 @@ const HistorialUser: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchOrders();
   }, []);
 
-  if (loading) return <p>Cargando historial...</p>;
-
-  if (orders.length === 0) return <p>No tienes compras realizadas aún.</p>;
+  if (loading) return <p className="text-center mt-8">Cargando historial...</p>;
+  if (orders.length === 0) return <p className="text-center mt-8">No tienes compras realizadas aún.</p>;
 
   return (
-    <div className="historialUser">
-      <h2>Historial de compras</h2>
+    // CAMBIO: Contenedor principal ahora usa la clase 'history-page'
+    <div className="history-page">
+      {/* CAMBIO: Título ahora es un h1 para coincidir con el CSS */}
+      <h1>Mi Historial de Compras</h1>
 
-      {orders.map((order) => (
-        <div
-          key={order.id}
-          className="order-card border p-4 rounded-xl my-3 shadow"
-        >
-          <div className="order-header flex justify-between">
-            <p>
-              <strong>Fecha:</strong>{" "}
-              {new Date(order.created_at).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>Total:</strong> ${order.total.toFixed(2)}
-            </p>
-            {order.coupon && (
-              <p className="text-green-600">
-                <strong>Cupón aplicado:</strong> {order.coupon}
-              </p>
-            )}
-          </div>
+      {/* CAMBIO: Se añade el div '.orders-list' que esperaba el CSS */}
+      <div className="orders-list">
+        {orders.map((order) => (
+          <div key={order.id} className="order-card">
+            
+            <div className="order-header">
+              {/* CAMBIO: Estructura de la cabecera ajustada */}
+              <h3>Pedido #{order.id}</h3>
+              <span className="order-date">
+                {new Date(order.created_at).toLocaleDateString()}
+              </span>
+            </div>
 
-          <div className="order-items mt-2">
-            {order.items.map((item, idx) => (
-              <div
-                key={idx}
-                className="order-item flex items-center gap-4 border-t py-2"
-              >
-                {item.image && (
-                  <img
-                    src={item.image}
-                    alt={item.name || `Producto ${item.product_id}`}
-                    className="w-16 h-16 object-cover rounded"
-                  />
+            {/* CAMBIO: Se añade '.order-body' para la sección de productos */}
+            <div className="order-body">
+              <h4>Productos</h4>
+              {/* CAMBIO: Se usa <ul> para la lista, como es semánticamente correcto */}
+              <ul className="order-items-list">
+                {order.items.map((item, idx) => (
+                  // CAMBIO: Cada item es un <li> con la clase '.order-item'
+                  <li key={idx} className="order-item">
+                    <span>{item.name} (x{item.quantity})</span>
+                    <span>${Number(item.price).toLocaleString("es-CO")}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* CAMBIO: Se añade la sección '.order-footer' para el cupón y el total */}
+            <div className="order-footer">
+              <div>
+                {order.coupon && (
+                  <span className="coupon-tag">Cupón: {order.coupon}</span>
                 )}
-                <div>
-                  <p>
-                    <strong>Producto:</strong>{" "}
-                    {item.name || `ID ${item.product_id}`}
-                  </p>
-                  <p>Cantidad: {item.quantity}</p>
-                  <p>Precio: ${item.price}</p>
-                </div>
               </div>
-            ))}
+              <span className="order-total">
+                Total: ${Number(order.total).toLocaleString("es-CO")}
+              </span>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

@@ -22,7 +22,7 @@ interface Order {
 const PaymentUser: React.FC = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [ ,setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     cardHolder: "",
     cardNumber: "",
@@ -109,10 +109,7 @@ const PaymentUser: React.FC = () => {
     return <div className="checkout-page"><p>Cargando orden...</p></div>;
   }
 
-  if (error) {
-    return <div className="checkout-page"><p className="error-message">{error}</p></div>;
-  }
-
+  
   return (
     <div className="checkout-page">
       <div className="checkout-content">
@@ -150,7 +147,7 @@ const PaymentUser: React.FC = () => {
             </div>
           </div>
         ) : (
-          <p className="no-order">No se encontraron los detalles de la orden.</p>
+          <p className="no-order">No se encontraron ordenes .</p>
         )}
       </div>
     </div>
