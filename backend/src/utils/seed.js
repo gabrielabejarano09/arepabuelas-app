@@ -23,14 +23,14 @@ const seed = async () => {
         ('Arepa Dulce', 'Arepa con miel', 1200, 40, 'arepa3.jpg'),
         ('Arepa Integral', 'Arepa saludable', 1300, 35, 'arepa4.jpg'),
         ('Arepa de Maíz Amarillo', 'Arepa especial', 1400, 25, 'arepa5.jpg')
-      ON CONFLICT (name) DO NOTHING
+      ON CONFLICT DO NOTHING
     `);
 
     // Crear cupón nuevo usuario
     await pool.query(`
-      INSERT INTO coupons (code, discount, discount_type, discount_value, active)
-      VALUES ('NEWUSER10', 10, 'percentage', 10, true)
-      ON CONFLICT (code) DO NOTHING
+      INSERT INTO coupons (code, discount_type, discount_value, active)
+      VALUES ('NEWUSER10', 'percentage', 10, true)
+      ON CONFLICT DO NOTHING
     `);
 
     console.log("✅ Seed completado");
@@ -42,6 +42,3 @@ const seed = async () => {
 };
 
 seed();
-
-
-

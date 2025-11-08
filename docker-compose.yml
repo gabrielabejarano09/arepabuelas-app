@@ -3,6 +3,7 @@ version: "3.9"
 services:
   db:
     image: postgres:15
+    container_name: arepabuelas-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -11,22 +12,36 @@ services:
       - db-data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+    networks:
+      - app-network
 
   backend:
-    build: ./backend
+    image: isadiac/arepabuelas-backend:latest
+    container_name: arepabuelas-backend
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/miappdb
-    ports:
-      - "5000:5000"
+      PORT: 5000
+      NODE_ENV: production
     depends_on:
       - db
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
 
   frontend:
-    build: ./frontend
+    image: isadiac/arepabuelas-frontend:latest
+    container_name: arepabuelas-frontend
     ports:
       - "3000:80"
     depends_on:
       - backend
+    networks:
+      - app-network
 
 volumes:
   db-data:
+
+networks:
+  app-network:
+    driver: bridge
