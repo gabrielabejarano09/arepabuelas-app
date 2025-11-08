@@ -121,5 +121,47 @@ export const changePassword = async (req, res) => {
     }
 };
 
+// Actualizar datos del usuario (sin foto)
+export const updateUserProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { name, email, password } = req.body;
 
+        // Buscar el usuario actual
+        const { rows } = await pool.query("SELECT * FROM users WHERE id=$1", [userId]);
+        const user = rows[0];
+        if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
 
+        // Solo usuarios activos pueden actualizar su perfil
+        if (user.status !== "active") {
+            return res.status(403).json({ message: "Solo los usuarios activos pueden modificar su perfil" });
+        }
+
+        // Validar email si se envía
+        if (email && !/\S+@\S+\.\S+/.test(email)) {
+            return res.status(400).json({ message: "Formato de email inválido" });
+        }
+
+        // Generar nuevo hash si se envía nueva contraseña
+        const password_hash = password ? hashPassword(password) : user.password_hash;
+
+        // Actualizar información
+        const { rows: updated } = await pool.query(
+            `UPDATE users
+             SET name = $1,
+                 email = $2,
+                 password_hash = $3
+             WHERE id = $4
+             RETURNING id, name, email, status`,
+            [name || user.name, email || user.email, password_hash, userId]
+        );
+
+        res.status(200).json({
+            message: "Perfil actualizado correctamente",
+            user: updated[0],
+        });
+    } catch (err) {
+        console.error("❌ Error al actualizar perfil:", err);
+        res.status(500).json({ message: "Error interno al actualizar el perfil" });
+    }
+};
