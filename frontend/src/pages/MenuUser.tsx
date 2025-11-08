@@ -1,8 +1,12 @@
 import axios from "axios";
 import "./MenuUser.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ShoppingCart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { AxiosError } from 'axios';
 
+// 1. La interfaz vuelve a usar 'id' numérico, como en tu primer código.
+// Esto es lo que tu base de datos SQL probablemente usa.
 interface Product {
   id: number;
   name: string;
@@ -22,9 +26,23 @@ const MenuUser = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const backendUrl = "http://localhost:4000";
+  const cartRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
-  // Obtener productos
+  // Cerrar carrito si se hace clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (cartRef.current && !cartRef.current.contains(event.target as Node)) {
+        setShowCart(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Obtener productos (el backend debe enviar los productos con un 'id' numérico)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -37,7 +55,7 @@ const MenuUser = () => {
     fetchProducts();
   }, []);
 
-  // Añadir al carrito
+  // La lógica del carrito vuelve a usar 'id' numérico
   const addToCart = (product: Product) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.product.id === product.id);
@@ -65,111 +83,125 @@ const MenuUser = () => {
     0
   );
 
-  const handleCheckout = () => {
-    alert(`Ir a pagar - total: $${total.toLocaleString("es-CO")}`);
-    // Aquí podrías redirigir al checkout real con tu endpoint /orders
+  // --- FUNCIÓN handleCheckout COMPLETAMENTE REESCRITA ---
+  const handleCheckout = async () => {
+    if (cart.length === 0) return;
+    setIsCreatingOrder(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Por favor, inicia sesión para realizar una compra.");
+        navigate("/login");
+        return;
+      }
+
+      // 2. Se construye el 'payload' con la estructura EXACTA que espera el nuevo backend
+      const orderPayload = {
+        // La clave principal ahora es 'products'
+        products: cart.map((item) => ({
+          product_id: item.product.id, // Se envía 'product_id' con el id numérico
+          quantity: item.qty,         // Se envía 'quantity' en lugar de 'qty'
+          price: item.product.price,    // El precio se mantiene
+        })),
+        // La clave del total ahora es 'totalAmount'
+        totalAmount: total,
+      };
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      // Se llama al mismo endpoint, pero el backend ahora procesa el nuevo payload
+      const { data: response } = await axios.post(
+        `${backendUrl}/api/orders`,
+        orderPayload,
+        config
+      );
+
+      // El nuevo backend devuelve un objeto 'order' con un 'id' numérico
+      const orderId = response.order.id;
+      if (orderId) {
+        setCart([]);
+        // Redirigimos a la página de pago, que ahora también usará el id numérico
+        navigate(`/payment/${orderId}`);
+      } else {
+        throw new Error("La respuesta del servidor no incluyó un ID de orden.");
+      }
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      const message = error.response?.data?.message || "Error al procesar el pago ❌";
+      alert(message);
+    } finally {
+      setIsCreatingOrder(false);
+    }
   };
 
   return (
     <div className="menu-page">
+      {/* ... El resto del JSX no necesita cambios, solo asegúrate de usar 'id' para las keys ... */}
       <header className="menu-header">
         <h1>Menú</h1>
-        <div className="cart-icon" onClick={() => setShowCart(!showCart)}>
-          <ShoppingCart size={28} />
-          {cart.length > 0 && <span className="cart-count">{cart.length}</span>}
+        <div className="cart-wrapper" ref={cartRef}>
+          <div className="cart-icon" onClick={() => setShowCart(!showCart)}>
+            <ShoppingCart size={28} />
+            {cart.length > 0 && <span className="cart-count">{cart.length}</span>}
+          </div>
+          {showCart && (
+            <div className="cart-dropdown">
+              <h3>Orden</h3>
+              {cart.length === 0 ? (<p>Tu carrito está vacío.</p>) : (
+                <>
+                  {cart.map((item) => (
+                    <div key={item.product.id} className="cart-item">
+                      <img src={`${backendUrl}/uploads/products/${item.product.image}`} alt={item.product.name} />
+                      <div className="cart-info">
+                        <p>{item.product.name}</p>
+                        <p>${item.product.price.toLocaleString("es-CO")}</p>
+                      </div>
+                      <div className="qty-controls">
+                        <button onClick={() => removeFromCart(item.product.id)}>-</button>
+                        <span>{item.qty}</span>
+                        <button onClick={() => addToCart(item.product)}>+</button>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="cart-total">
+                    <strong>Total:</strong> ${total.toLocaleString("es-CO")}
+                  </div>
+                  <button className="checkout-btn" onClick={handleCheckout} disabled={isCreatingOrder}>
+                    {isCreatingOrder ? "Procesando..." : "Ir a pagar"}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </header>
-
-      {/* Grid de productos */}
       <div className="product-grid">
         {products.map((product) => (
-          <div
-            key={product.id}
-            className="product-card"
-            onClick={() => setSelectedProduct(product)}
-          >
-            {product.image ? (
-              <img
-                src={`${backendUrl}/uploads/products/${product.image}`}
-                alt={product.name}
-                className="product-image"
-              />
-            ) : (
-              <div className="product-image-placeholder">Sin imagen</div>
-            )}
+          <div key={product.id} className="product-card" onClick={() => setSelectedProduct(product)}>
+            {product.image ? (<img src={`${backendUrl}/uploads/products/${product.image}`} alt={product.name} className="product-image"/>) : (<div className="product-image-placeholder">Sin imagen</div>)}
             <h3>{product.name}</h3>
             <p>{product.description}</p>
             <div className="product-footer">
-              <span className="product-price">
-                ${product.price.toLocaleString("es-CO")}
-              </span>
-              <span className="product-stock">👥 {product.stock}</span>
+              <span className="product-price">${product.price.toLocaleString("es-CO")}</span>
+              <span className="product-stock">Disponibles: {product.stock}</span>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Panel lateral del carrito */}
-      {showCart && (
-        <div className="cart-panel">
-          <h2>Orden</h2>
-          {cart.length === 0 ? (
-            <p>Tu carrito está vacío.</p>
-          ) : (
-            <>
-              {cart.map((item) => (
-                <div key={item.product.id} className="cart-item">
-                  <img
-                    src={`${backendUrl}/uploads/products/${item.product.image}`}
-                    alt={item.product.name}
-                  />
-                  <div className="cart-info">
-                    <p>{item.product.name}</p>
-                    <span>${item.product.price.toLocaleString("es-CO")}</span>
-                  </div>
-                  <div className="qty-controls">
-                    <button onClick={() => removeFromCart(item.product.id)}>
-                      -
-                    </button>
-                    <span>{item.qty}</span>
-                    <button onClick={() => addToCart(item.product)}>+</button>
-                  </div>
-                </div>
-              ))}
-              <div className="cart-total">
-                <strong>Total:</strong> ${total.toLocaleString("es-CO")}
-              </div>
-              <button className="checkout-btn" onClick={handleCheckout}>
-                Ir a pagar
-              </button>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* Modal de producto */}
       {selectedProduct && (
         <div className="modal-overlay" onClick={() => setSelectedProduct(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={`${backendUrl}/uploads/products/${selectedProduct.image}`}
-              alt={selectedProduct.name}
-              className="modal-image"
-            />
+            <img src={`${backendUrl}/uploads/products/${selectedProduct.image}`} alt={selectedProduct.name} className="modal-image"/>
             <h2>{selectedProduct.name}</h2>
             <p>{selectedProduct.description}</p>
-            <p className="modal-price">
-              ${selectedProduct.price.toLocaleString("es-CO")}
-            </p>
-            <button
-              className="add-cart-btn"
-              onClick={() => {
-                addToCart(selectedProduct);
-                setSelectedProduct(null);
-              }}
-            >
-              Añadir al carrito
-            </button>
+            <p className="modal-price">${selectedProduct.price.toLocaleString("es-CO")}</p>
+            <button className="add-cart-btn" onClick={() => {addToCart(selectedProduct); setSelectedProduct(null);}}>Añadir al carrito</button>
           </div>
         </div>
       )}

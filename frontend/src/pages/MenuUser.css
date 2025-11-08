@@ -1,7 +1,13 @@
 .menu-page {
+  display: flex;
+  flex-direction: column;
   width: 100%;
+  height: 100vh;
   padding: 2rem 3rem;
+  box-sizing: border-box;
   position: relative;
+  overflow: hidden;
+  color: #000;
 }
 
 .menu-header {
@@ -9,6 +15,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  flex-shrink: 0;
 }
 
 .menu-header h1 {
@@ -20,6 +27,14 @@
   position: relative;
   cursor: pointer;
   color: #5e503f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.cart-icon:hover {
+  transform: scale(1.1);
 }
 
 .cart-count {
@@ -33,24 +48,39 @@
   padding: 3px 6px;
 }
 
+/* --- CONTENEDOR PRINCIPAL --- */
+.menu-content {
+  display: flex;
+  flex: 1;
+  gap: 2rem;
+  overflow: hidden;
+}
+
+/* --- GRID DE PRODUCTOS --- */
 .product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
   gap: 25px;
+  align-content: flex-start;
+  overflow-y: auto;
+  padding-right: 1rem;
 }
 
 .product-card {
   background: #fff;
   border-radius: 15px;
+  width: 280px;
   padding: 20px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
   text-align: center;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .product-card:hover {
   transform: scale(1.03);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
 }
 
 .product-image {
@@ -68,19 +98,21 @@
   font-weight: 500;
 }
 
-/* Panel lateral del carrito */
+/* --- PANEL LATERAL DEL CARRITO --- */
 .cart-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
+  position: relative;
   width: 350px;
-  height: 100%;
   background: #fff;
   box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
   padding: 25px;
-  z-index: 1000;
   display: flex;
   flex-direction: column;
+  transition: transform 0.4s ease;
+  border-radius: 12px 0 0 12px;
+}
+
+.cart-panel.closed {
+  transform: translateX(120%);
 }
 
 .cart-panel h2 {
@@ -137,7 +169,7 @@
   cursor: pointer;
 }
 
-/* Modal */
+/* --- MODAL PRODUCTO --- */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -158,6 +190,7 @@
   width: 400px;
   text-align: center;
   position: relative;
+  animation: fadeIn 0.3s ease;
 }
 
 .modal-image {
@@ -175,4 +208,89 @@
   padding: 10px 20px;
   border-radius: 10px;
   cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.cart-dropdown {
+  position: absolute;
+  top: 70px; /* separa un poco del header */
+  right: 40px; /* ajústalo según tu ícono */
+  width: 350px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  z-index: 1000;
+  animation: dropdownIn 0.2s ease-out;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cart-dropdown h3 {
+  margin-bottom: 15px;
+  color: black;
+}
+
+.cart-dropdown .cart-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.cart-dropdown .cart-item img {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.cart-dropdown .cart-info p {
+  margin: 0;
+  color: black;
+}
+
+.cart-dropdown .qty-controls button {
+  background: #5e503f;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+.cart-dropdown .cart-total {
+  font-weight: bold;
+  color: black;
+  margin-top: 10px;
+}
+
+.cart-dropdown .checkout-btn {
+  background-color: #5e503f;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 10px;
+  cursor: pointer;
+  width: 100%;
 }

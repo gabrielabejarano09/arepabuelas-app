@@ -121,21 +121,7 @@
   font-size: 0.9rem;
 }
 
-.product-action-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background-color: #5E503F;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s;
-}
+
 
 .product-action-btn:hover {
   background-color: #c9184a; /* Color rojo al pasar el mouse para indicar peligro */
