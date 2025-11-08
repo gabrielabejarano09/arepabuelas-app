@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-interface Product {
-  name: string;
+interface OrderItem {
+  product_id: number;
+  quantity: number;
   price: number;
+  name?: string;
   image?: string;
 }
 
-interface Item {
-  product: Product;
-  qty: number;
-}
-
 interface Order {
-  _id: string;
-  items: Item[];
+  id: string;
   total: number;
-  status: string;
-  createdAt: string;
+  coupon?: string;
+  created_at: string;
+  items: OrderItem[];
 }
 
 const HistorialUser: React.FC = () => {
@@ -31,6 +28,9 @@ const HistorialUser: React.FC = () => {
         const { data } = await axios.get("http://localhost:4000/orders", {
           headers: { Authorization: `Bearer ${token}` },
         });
+
+        // 🔹 (Opcional) Puedes hacer otra petición para traer nombres/imágenes de productos
+        // o simplemente mostrar los IDs por ahora.
         setOrders(data);
       } catch (error) {
         console.error("Error al obtener historial:", error);
@@ -49,30 +49,48 @@ const HistorialUser: React.FC = () => {
   return (
     <div className="historialUser">
       <h2>Historial de compras</h2>
+
       {orders.map((order) => (
-        <div key={order._id} className="order-card">
-          <div className="order-header">
+        <div
+          key={order.id}
+          className="order-card border p-4 rounded-xl my-3 shadow"
+        >
+          <div className="order-header flex justify-between">
             <p>
               <strong>Fecha:</strong>{" "}
-              {new Date(order.createdAt).toLocaleDateString()}
+              {new Date(order.created_at).toLocaleDateString()}
             </p>
             <p>
               <strong>Total:</strong> ${order.total.toFixed(2)}
             </p>
+            {order.coupon && (
+              <p className="text-green-600">
+                <strong>Cupón aplicado:</strong> {order.coupon}
+              </p>
+            )}
           </div>
-          <div className="order-items">
+
+          <div className="order-items mt-2">
             {order.items.map((item, idx) => (
-              <div key={idx} className="order-item">
-                {item.product.image && (
+              <div
+                key={idx}
+                className="order-item flex items-center gap-4 border-t py-2"
+              >
+                {item.image && (
                   <img
-                    src={item.product.image}
-                    alt={item.product.name}
-                    className="item-img"
+                    src={item.image}
+                    alt={item.name || `Producto ${item.product_id}`}
+                    className="w-16 h-16 object-cover rounded"
                   />
                 )}
-                <p>{item.product.name}</p>
-                <p>Cantidad: {item.qty}</p>
-                <p>Precio: ${item.product.price}</p>
+                <div>
+                  <p>
+                    <strong>Producto:</strong>{" "}
+                    {item.name || `ID ${item.product_id}`}
+                  </p>
+                  <p>Cantidad: {item.quantity}</p>
+                  <p>Precio: ${item.price}</p>
+                </div>
               </div>
             ))}
           </div>
