@@ -1,47 +1,55 @@
-version: "3.9"
-
 services:
-  db:
-    image: postgres:15
+  # 1. Servicio de la Base de Datos (Ahora con inicialización integrada)
+  postgres:
+    image: postgres:14-alpine
     container_name: arepabuelas-db
+    restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: miappdb
+      # Estas variables crean la DB y el usuario automáticamente
+      POSTGRES_DB: arepas_db
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: 12345
     volumes:
-      - db-data:/var/lib/postgresql/data
+      # El volumen de datos persistentes
+      - postgres_data:/var/lib/postgresql/data
+      # ¡CAMBIO CLAVE! Montamos el script SQL en el directorio de inicialización
+      - ./db_init/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5433:5432"
-    networks:
-      - app-network
+      - "5432:5432"
+    # ¡CAMBIO CLAVE! Añadimos una comprobación de salud
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appuser -d arepas_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # 2. Servicio del Backend (Ahora depende de la salud de Postgres)
   backend:
-    image: isadiac/arepabuelas-backend:latest
+    build: ./backend
     container_name: arepabuelas-backend
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/miappdb
-      PORT: 5000
-      NODE_ENV: production
-    depends_on:
-      - db
+    restart: unless-stopped
     ports:
-      - "5000:5000"
-    networks:
-      - app-network
+      - "4000:4000"
+    environment:
+      # La URL de conexión no cambia
+      DATABASE_URL: postgres://appuser:12345@postgres:5432/arepas_db
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      # ¡CAMBIO CLAVE! Espera a que el servicio de postgres esté "saludable"
+      postgres:
+        condition: service_healthy
 
+  # 3. Servicio del Frontend (sin cambios)
   frontend:
-    image: isadiac/arepabuelas-frontend:latest
+    build: ./frontend
     container_name: arepabuelas-frontend
+    restart: always
     ports:
       - "3000:80"
     depends_on:
       - backend
-    networks:
-      - app-network
 
 volumes:
-  db-data:
-
-networks:
-  app-network:
-    driver: bridge
+  postgres_data: {}
