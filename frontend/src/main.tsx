@@ -6,9 +6,9 @@ import "./index.css";
 // Páginas Públicas
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import MenuUser from "./pages/MenuUser";
-import HistorialUser from "./pages/HistorialUser";
-import PaymentUser from "./pages/PaymentUser";
+import MenuUser from "./pages/users/MenuUser";
+import HistorialUser from "./pages/users/HistorialUser";
+import PaymentUser from "./pages/users/PaymentUser";
 
 // Componentes de Rutas
 import ProtectedRoute from "./components/ProtectedRoute";
