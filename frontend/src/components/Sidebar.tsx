@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import './Sidebar.css';
 import logo from '../assets/logo-blanco.png'; // Reutilizamos el logo
-import { FiHome, FiUsers, FiClock, FiSettings, FiLogOut } from 'react-icons/fi'; // Iconos de ejemplo
+import { FiHome, FiUsers, FiClock, FiLogOut } from 'react-icons/fi'; // Iconos de ejemplo
 
 const Sidebar = () => {
   return (
@@ -21,10 +21,6 @@ const Sidebar = () => {
         <NavLink to="/historial" className="nav-link">
           <FiClock className="nav-icon" />
           <span>Historial</span>
-        </NavLink>
-        <NavLink to="/ajustes" className="nav-link">
-          <FiSettings className="nav-icon" />
-          <span>Ajustes</span>
         </NavLink>
       </nav>
       <div className="sidebar-footer">

@@ -204,3 +204,40 @@ export const getOrderById = async (req, res) => {
     res.status(500).json({ message: "Error al obtener la orden" });
   }
 };
+
+export const getAllOrders = async (req, res) => {
+  try {
+    // Consulta que une órdenes, usuarios, y agrupa los items de los productos
+    const { rows } = await pool.query(
+      `SELECT 
+         o.id, 
+         o.total, 
+         o.coupon, 
+         o.created_at, 
+         o.is_paid,
+         o.status,
+         u.email AS user_email, -- <-- Obtenemos el email del usuario
+         COALESCE(
+           json_agg(
+             json_build_object(
+               'product_id', p.id,
+               'name', p.name,
+               'quantity', oi.quantity,
+               'price', oi.price
+             )
+           ) FILTER (WHERE p.id IS NOT NULL), '[]'
+         ) AS items
+       FROM orders o
+       JOIN users u ON o.user_id = u.id -- <-- Unimos con la tabla de usuarios
+       LEFT JOIN order_items oi ON o.id = oi.order_id
+       LEFT JOIN products p ON oi.product_id = p.id
+       GROUP BY o.id, u.email -- <-- Agrupamos también por email
+       ORDER BY o.created_at DESC`, // Ordenamos de la más nueva a la más vieja
+    );
+
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error("Error al obtener todas las órdenes:", err);
+    res.status(500).json({ message: "Error al obtener el historial de órdenes" });
+  }
+};
