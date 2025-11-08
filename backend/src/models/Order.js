@@ -1,28 +1,35 @@
-import mongoose from "mongoose";
+// backend/models/orderModel.js
+const mongoose = require('mongoose');
 
-const orderSchema = new mongoose.Schema(
+const orderSchema = mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    items: [
-      {
-        product: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-          required: true
-        },
-        qty: { type: Number, required: true, min: 1 }
-      }
-    ],
-    total: { type: Number, required: true },
-    status: {
-      type: String,
-      enum: ["pending", "paid", "failed", "cancelled"],
-      default: "pending"
+    // ... otros campos del pedido (user, orderItems, etc.)
+    isPaid: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
-    coupon: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon", default: null }
+    paidAt: {
+      type: Date,
+    },
+    paymentResult: { // Para guardar la info del pago simulado
+      id: { type: String },
+      status: { type: String },
+      update_time: { type: String },
+      email_address: { type: String },
+    },
+    totalPrice: {
+      type: Number,
+      required: true,
+      default: 0.0,
+    },
+    // ... otros campos
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-const Order = mongoose.model("Order", orderSchema);
-export default Order;
+const Order = mongoose.model('Order', orderSchema);
+
+module.exports = Order;

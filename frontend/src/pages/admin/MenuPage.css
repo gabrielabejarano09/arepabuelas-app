@@ -66,7 +66,7 @@
 
 .product-image, .product-image-placeholder {
   flex-shrink: 0; /* Evita que la imagen se encoja */
-  width: 120px;
+  width: 100px;
   height: 120px;
   object-fit: cover;
   border-radius: 10px;
@@ -121,21 +121,7 @@
   font-size: 0.9rem;
 }
 
-.product-action-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background-color: #5E503F;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s;
-}
+
 
 .product-action-btn:hover {
   background-color: #c9184a; /* Color rojo al pasar el mouse para indicar peligro */
@@ -143,8 +129,6 @@
 
 .product-action-btn {
   color: white;
-  background-color: #4a3f31;
-
 }
 
 .error-text {
@@ -160,7 +144,6 @@
 .name{
     width: 7rem;
 }
-
 
 .product-card-wrapper {
   position: relative; /* Necesario para posicionar el botón de eliminar */

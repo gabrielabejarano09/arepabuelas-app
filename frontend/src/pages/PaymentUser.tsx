@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom"; // <-- 1. Importar useParams
+import axios from "axios"; // Usaremos axios para consistencia
 import "./PaymentUser.css";
+import { AxiosError } from 'axios';
 
+// Interfaces actualizadas para reflejar los datos que traerá el backend
 interface OrderItem {
-  product_id: number;
+  name: string; // <-- Ahora tendremos el nombre del producto
+  image: string; // <-- Y la imagen
   quantity: number;
   price: number;
 }
@@ -16,156 +21,136 @@ interface Order {
 
 const PaymentUser: React.FC = () => {
   const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    name: "",
+    cardHolder: "",
     cardNumber: "",
-    expiry: "",
+    expiryMonth: "",
+    expiryYear: "",
     cvv: "",
-    address: "",
-    phone: "",
   });
+  
+  const navigate = useNavigate();
+  const { orderId } = useParams<{ orderId: string }>(); // <-- 2. Obtener el ID de la URL
+  const backendUrl = "http://localhost:4000";
 
+  // 3. useEffect ahora busca una sola orden usando el orderId de la URL
   useEffect(() => {
+    if (!orderId) {
+      setError("No se especificó un ID de orden.");
+      setLoading(false);
+      return;
+    }
+
     const fetchOrder = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:4000/api/orders", {
+        const config = {
           headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const data = await res.json();
-        // Tomamos la orden más reciente del usuario
-        if (data && data.length > 0) {
-          setOrder(data[0]);
-        }
+        };
+        // Hacemos la llamada al nuevo endpoint GET /api/orders/:id
+        const { data } = await axios.get(`${backendUrl}/api/orders/${orderId}`, config);
+        setOrder(data);
       } catch (err) {
         console.error("Error al obtener la orden:", err);
+        setError("No se pudo cargar la orden. Intenta de nuevo.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchOrder();
-  }, []);
+  }, [orderId]); // El efecto se ejecuta si el orderId cambia
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePay = async () => {
-    if (!order) return;
+  const handlePay = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // El ID de la orden ahora viene del parámetro de la URL, no del estado
+    if (!orderId) {
+      alert("Error: No hay ID de orden para pagar.");
+      return;
+    }
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:4000/api/orders/pay", {
-        method: "POST",
+      const payload = {
+        orderId: orderId, // <-- 4. Usamos el orderId de la URL
+        paymentDetails: formData,
+      };
+
+      const config = {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          orderId: order.id,
-          amount: order.total,
-        }),
-      });
+      };
 
-      const data = await res.json();
-      if (res.ok) {
-        alert("Pago realizado con éxito ✅");
-        console.log(data);
-      } else {
-        alert(data.message || "Error al procesar el pago ❌");
-      }
+      await axios.post(`${backendUrl}/api/orders/pay`, payload, config);
+
+      alert("Pago realizado con éxito ✅");
+      navigate("/purchased"); // Redirige al historial de órdenes
     } catch (err) {
-      console.error("Error en el pago:", err);
+      const error = err as AxiosError<{ message: string }>;
+
+    // 4. El resto de tu lógica funciona igual, pero ahora es 100% seguro en tipos
+    const message = error.response?.data?.message || "Error al procesar el pago ❌";
+    setError(message);
+    alert(message);
     }
   };
+
+  if (loading) {
+    return <div className="checkout-page"><p>Cargando orden...</p></div>;
+  }
+
+  if (error) {
+    return <div className="checkout-page"><p className="error-message">{error}</p></div>;
+  }
 
   return (
     <div className="checkout-page">
       <div className="checkout-content">
-        <h2>Pagar</h2>
+        <h2>Pagar Orden #{order?.id}</h2>
 
         {order ? (
           <div className="checkout-sections">
-            {/* Sección de orden */}
             <div className="order-section">
-              <h3>Orden</h3>
+              <h3>Resumen del Pedido</h3>
               {order.items.map((item, i) => (
                 <div key={i} className="order-item">
-                  <img src="/arepa.png" alt="Producto" />
+                  <img src={`${backendUrl}/uploads/products/${item.image}`} alt={item.name} />
                   <div>
-                    <p className="product-name">Producto #{item.product_id}</p>
-                    <p>$ {item.price.toLocaleString()}</p>
-                  </div>
-                  <div className="qty-control">
-                    <span>{item.quantity}</span>
+                    <p className="product-name">{item.name} (x{item.quantity})</p>
+                    <p>$ {item.price.toLocaleString("es-CO")}</p>
                   </div>
                 </div>
               ))}
-              <p className="total">Total: {order.total.toLocaleString()}</p>
+              {order.coupon && <p className="coupon">Cupón aplicado: {order.coupon}</p>}
+              <p className="total">Total a Pagar: ${Number(order.total).toLocaleString("es-CO")}</p>
             </div>
 
-            {/* Sección de pago */}
             <div className="payment-section">
               <h3>Información de pago</h3>
-              <form>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Nombre Completo"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                />
-                <input
-                  type="text"
-                  name="cardNumber"
-                  placeholder="Número de tarjeta"
-                  value={formData.cardNumber}
-                  onChange={handleInputChange}
-                />
+              <form onSubmit={handlePay}>
+                <input type="text" name="cardHolder" placeholder="Nombre en la tarjeta" value={formData.cardHolder} onChange={handleInputChange} required />
+                <input type="text" name="cardNumber" placeholder="Número de tarjeta (ej: 4242...)" value={formData.cardNumber} onChange={handleInputChange} required />
                 <div className="inline-fields">
-                  <input
-                    type="text"
-                    name="expiry"
-                    placeholder="Fecha de expiración"
-                    value={formData.expiry}
-                    onChange={handleInputChange}
-                  />
-                  <input
-                    type="text"
-                    name="cvv"
-                    placeholder="CVV"
-                    value={formData.cvv}
-                    onChange={handleInputChange}
-                  />
+                  <input type="text" name="expiryMonth" placeholder="Mes (MM)" value={formData.expiryMonth} onChange={handleInputChange} required />
+                  <input type="text" name="expiryYear" placeholder="Año (AAAA)" value={formData.expiryYear} onChange={handleInputChange} required />
                 </div>
-                <input
-                  type="text"
-                  name="address"
-                  placeholder="Dirección de facturación"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                />
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder="Teléfono de contacto"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                />
+                <input type="text" name="cvv" placeholder="CVV" value={formData.cvv} onChange={handleInputChange} required />
+                <button className="pay-btn" type="submit">Pagar</button>
               </form>
-
-              <p className="coupon">
-                Cupón aplicado: {order.coupon || "Ninguno"}
-              </p>
-
-              <button className="pay-btn" onClick={handlePay}>
-                Pagar
-              </button>
             </div>
           </div>
         ) : (
-          <p className="no-order">No hay órdenes disponibles.</p>
+          <p className="no-order">No se encontraron los detalles de la orden.</p>
         )}
       </div>
     </div>
