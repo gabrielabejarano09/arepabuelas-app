@@ -165,3 +165,36 @@ export const getUserOrders = async (req, res) => {
   }
 };
 
+// ARCHIVO: backend/src/controllers/order.controller.js
+
+export const getOrderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const { rows: orderRows } = await pool.query(
+      "SELECT * FROM orders WHERE id = $1 AND user_id = $2",
+      [id, userId]
+    );
+
+    if (orderRows.length === 0) {
+      return res.status(404).json({ message: "Orden no encontrada" });
+    }
+
+    const { rows: itemRows } = await pool.query(
+      `SELECT oi.quantity, oi.price, p.name, p.image
+       FROM order_items oi
+       JOIN products p ON p.id = oi.product_id
+       WHERE oi.order_id = $1`,
+      [id]
+    );
+
+    const order = orderRows[0];
+    order.items = itemRows;
+
+    res.json(order);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error al obtener la orden" });
+  }
+};
